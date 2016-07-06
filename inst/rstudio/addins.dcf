@@ -1,0 +1,4 @@
+Name: Beta Distribution
+Description: Allows the user to play with the two shape parameters of a Beta distribution.
+Binding: beta_addin
+Interactive: true
