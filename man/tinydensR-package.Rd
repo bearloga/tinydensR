@@ -2,11 +2,10 @@
 % Please edit documentation in R/tinydensR.R
 \docType{package}
 \name{tinydensR-package}
-\alias{tinydensR}
 \alias{tinydensR-package}
+\alias{tinydensR}
 \title{tinydensR: RStudio add-ins for interactively visualizing probability distributions}
 \description{
 A set of RStudio add-ins for playing with distribution parameters
   and visualizing the resulting probability density and mass functions.
 }
-

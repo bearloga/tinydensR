@@ -1,74 +1,115 @@
-#' @title Beta distribution gadget
-#' @description This gadget lets you choose the parameters of a Beta
-#'   distribution easily. It supports two parameterization options: the classic
-#'   one with shape parameters and a more intuitive one using the expectation
-#'   and precision as proposed by Ferrari and Cribari-Neto (2004).
-#' @return A numeric vector containing the chosen shape parameter values.
+#' @title Univariate continuous distribution gadget
+#' @description This gadget lets you choose the parameters of a univariate,
+#'   continuous distribution easily. For certain distributions, it supports
+#'   multiple parameterization options. For example, the Beta distribution
+#'   has two parameterizations: the classic one with shape parameters and a
+#'   more intuitive one using the expectation and precision as proposed by
+#'   Ferrari and Cribari-Neto (2004).
+#' @return A named vector containing the chosen parameter value(s).
 #' @import shiny
 #' @import miniUI
 #' @references Ferrari, S., & Cribari-Neto, F. (2004). Beta regression for
 #'   modelling rates and proportions. Journal of Applied Statistics.
 #' @export
-beta_addin <- function() {
+univariate_continuous_addin <- function() {
   
   if (!requireNamespace("rstudioapi", quietly = TRUE)) {
-    stop("you must have RStudio v0.99.878 or newer to use this gadget",
-         call. = FALSE)
+    stop("you must have RStudio v0.99.878 or newer to use this gadget", call. = FALSE)
   }
   
   ui <- miniPage(
-    gadgetTitleBar("Beta Distribution"),
+    gadgetTitleBar("Univariate Continuous Distribution"),
     miniContentPanel(
-      fillPage(
-        fillCol(fillRow(radioButtons("params", "Parameterization",
-                                     choices = c("Classic", "Intuitive"),
-                                     inline = TRUE),
-                        height = "50px"),
-                fillRow(uiOutput("slider_1"), uiOutput("slider_2"), height = "100px"),
-                plotOutput("distribution"),
-                flex = c(1, 2, 8)))
-    )
+      shinyjs::useShinyjs(),
+      fillRow(
+        selectInput(
+          "distribution", "Distribution",
+          c("Normal", "Beta", "Inverse-gamma"),
+          selected = "Beta", multiple = FALSE
+        ),
+        radioButtons("parameterization", "Parameterization",
+                     choices = c("Classic", "Intuitive"),
+                     inline = TRUE),
+        height = "100px"
+      ),
+      uiOutput("parameters"),
+      plotOutput("distribution")
+    ),
+    theme = shinythemes::shinytheme("flatly")
   )
   
   server <- function(input, output, session) {
-    output$slider_1 <- renderUI({
-      if (input$params == "Classic") {
-        sliderInput('a', 'α', 0.1, 100, step = 0.01, value = 1.5,
-                    width = '90%', animate = TRUE)
-      } else {
-        sliderInput('expectation', 'Expected Response', 0, 1, step = 0.01, value = 0.5,
-                    width = '90%', animate = TRUE)
-      }
-    })
-    
-    output$slider_2 <- renderUI({
-      if (input$params == "Classic") {
-        sliderInput('b', 'β', 0.1, 100, step = 0.01, value = 1.5,
-                    width = '90%', animate = TRUE)
-      } else {
-        sliderInput('precision', 'Precision', 0.1, 100, step = 0.1, value = 3,
-                    width = '90%', animate = TRUE)
+    output$parameters <- renderUI({
+      if (input$distribution == "Normal") {
+        shinyjs::disable("parameterization")
+        fillRow(
+          sliderInput('mean', HTML("&mu;"), -10, 10, step = 0.1, value = 0, width = '90%'),
+          sliderInput('sd', HTML("&sigma;"), 0.1, 100, step = 0.1, value = 1, width = '90%'),
+          height = "100px"
+        )
+      } else if (input$distribution == "Beta") {
+        shinyjs::enable("parameterization")
+        if (input$parameterization == "Classic") {
+          fillRow(
+            sliderInput('a', HTML("&alpha;"), 0.1, 100, step = 0.01, value = 1.5, width = '90%'),
+            sliderInput('b', HTML("&beta;"), 0.1, 100, step = 0.01, value = 1.5, width = '90%'),
+            height = "100px"
+          )
+        } else {
+          fillRow(
+            sliderInput('expectation', 'Expected Response', 0, 1, step = 0.01, value = 0.5, width = '90%'),
+            sliderInput('precision', 'Precision', 0.1, 100, step = 0.1, value = 3, width = '90%'),
+            height = "100px"
+          )
+        }
+      } else if (input$distribution == "Inverse-gamma") {
+        shinyjs::disable("parameterization")
+        fillRow(
+          sliderInput('a', HTML("&alpha; (shape)"), 0.001, 10, step = 0.001, value = 0.01, width = '90%'),
+          sliderInput('b', HTML("&beta; (scale)"), 0.001, 10, step = 0.001, value = 0.01, width = '90%'),
+          height = "100px"
+        )
       }
     })
     
     output$distribution <- renderPlot({
-      if (input$params == "Classic") {
-        a <- input$a
-        b <- input$b
-      } else {
-        a <- input$expectation * input$precision
-        b <- (1 - input$expectation) * input$precision
+      mu <- input$mean; sigma <- input$sd
+      if (input$distribution == "Normal") {
+        curve(dnorm(x, mu, sigma),
+              from = -20, to = 20, n = 201,
+              ylab = expression(f(x ~ "|" ~ mu, sigma)), lwd = 2,
+              main = sprintf("Normal(%0.2f,%0.2f)", mu, sigma))
+      } else if (input$distribution == "Beta") {
+        if (input$parameterization == "Classic") {
+          a <- input$a; b <- input$b
+        } else {
+          a <- input$expectation * input$precision
+          b <- (1 - input$expectation) * input$precision
+        }
+        curve(dbeta(x, shape1 = a, shape2 = b),
+              from = 0, to = 1, n = 201,
+              ylab = expression(f(x ~ "|" ~ alpha, beta)), lwd = 2,
+              main = sprintf("Beta(%0.2f,%0.2f)", a, b))
+      } else if (input$distribution == "Inverse-gamma") {
+        a <- input$a; b <- input$b
+        curve(extraDistr::dinvgamma(x, alpha = a, beta = b),
+              from = 0, to = 10, n = 201,
+              ylab = expression(f(x ~ "|" ~ alpha, beta)), lwd = 2,
+              main = sprintf("Inv-Gamma(%0.2f,%0.2f)", a, b))
       }
-      curve(dbeta(x, shape1 = a, shape2 = b), from = 0, to = 1, n = 201,
-            ylab = expression(f(x ~ "|" ~ alpha, beta)), lwd = 2,
-            main = sprintf("Beta(%0.2f,%0.2f)", a, b))
     })
     observeEvent(input$done, {
-      if (input$params == "Classic") {
-        output <- c("shape1" = input$a, "shape2" = input$b)
-      } else {
-        output <- c("shape1" = input$expectation * input$precision,
-                    "shape2" = (1 - input$expectation) * input$precision)
+      if (input$distribution == "Normal") {
+        output <- c("mean" = input$mean, "std.dev" = input$sd)
+      } else if (input$distribution == "Beta") {
+        if (input$parameterization == "Classic") {
+          output <- c("shape1" = input$a, "shape2" = input$b)
+        } else {
+          output <- c("shape1" = input$expectation * input$precision,
+                      "shape2" = (1 - input$expectation) * input$precision)
+        }
+      } else if (input$distribution == "Inverse-gamma") {
+        output <- c("alpha" = input$a, "beta" = input$b)
       }
       stopApp(output)
     })

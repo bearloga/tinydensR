@@ -1,5 +1,6 @@
 # tinydensR
-An RStudio addin for playing with distribution parameters and visualizing the resulting probability density and mass functions.
+
+An [RStudio add-in](https://shiny.rstudio.com/articles/gadgets.html) for playing with distribution parameters and visualizing the resulting probability density and mass functions.
 
 ## Installation
 
@@ -8,6 +9,27 @@ if ( !('devtools' %in% installed.packages()) ) install.packages("devtools")
 
 devtools::install_github("bearloga/tinydensR")
 ```
+
+## Distributions
+
+- Univariate
+  - Discrete
+    - [ ] Binomial
+    - [ ] Hypergeometric
+    - [ ] Poisson
+  - Continuous
+    - [x] Beta
+    - [ ] Chi-squared
+    - [ ] Exponential
+    - [ ] Gamma
+    - [x] Inverse-gamma
+    - [x] Normal
+- Multivariate
+  - Discrete
+    - [ ] Multinomial
+  - Continuous
+    - [ ] Bivariate Normal
+    - [ ] Dirichlet
 
 ## Code of Conduct
 

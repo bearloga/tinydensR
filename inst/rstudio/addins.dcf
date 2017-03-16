@@ -1,4 +1,4 @@
-Name: Beta Distribution
-Description: Allows the user to play with the two shape parameters of a Beta distribution.
-Binding: beta_addin
+Name: Univariate Continuous Distributions
+Description: Allows the user to play with the parameters of a univariate continuous distribution.
+Binding: univariate_continuous_addin
 Interactive: true
