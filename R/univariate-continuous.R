@@ -73,8 +73,8 @@ univariate_continuous_addin <- function() {
     })
     
     output$distribution <- renderPlot({
-      mu <- input$mean; sigma <- input$sd
       if (input$distribution == "Normal") {
+        mu <- input$mean; sigma <- input$sd
         curve(dnorm(x, mu, sigma),
               from = -20, to = 20, n = 201,
               ylab = expression(f(x ~ "|" ~ mu, sigma)), lwd = 2,

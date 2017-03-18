@@ -2,3 +2,8 @@ Name: Univariate Continuous Distributions
 Description: Allows the user to play with the parameters of a univariate continuous distribution.
 Binding: univariate_continuous_addin
 Interactive: true
+
+Name: Univariate Discrete Distributions
+Description: Allows the user to play with the parameters of a univariate discrete distribution.
+Binding: univariate_discrete_addin
+Interactive: true

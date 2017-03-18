@@ -14,7 +14,7 @@ devtools::install_github("bearloga/tinydensR")
 
 - Univariate
   - Discrete
-    - [ ] Binomial
+    - [x] Binomial
     - [ ] Hypergeometric
     - [ ] Poisson
   - Continuous
