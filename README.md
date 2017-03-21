@@ -19,7 +19,7 @@ devtools::install_github("bearloga/tinydensR")
     - [ ] Poisson
   - Continuous
     - [x] Beta
-    - [ ] Chi-squared
+    - [x] Chi-squared
     - [ ] Exponential
     - [ ] Gamma
     - [x] Inverse-gamma

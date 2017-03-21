@@ -24,7 +24,7 @@ univariate_continuous_addin <- function() {
       fillRow(
         selectInput(
           "distribution", "Distribution",
-          c("Normal", "Beta", "Inverse-gamma"),
+          c("Normal", "Beta", "Inverse-gamma", "Chi-squared"),
           selected = "Beta", multiple = FALSE
         ),
         radioButtons("parameterization", "Parameterization",
@@ -65,8 +65,15 @@ univariate_continuous_addin <- function() {
       } else if (input$distribution == "Inverse-gamma") {
         shinyjs::disable("parameterization")
         fillRow(
-          sliderInput('a', HTML("&alpha; (shape)"), 0.001, 10, step = 0.001, value = 0.01, width = '90%'),
-          sliderInput('b', HTML("&beta; (scale)"), 0.001, 10, step = 0.001, value = 0.01, width = '90%'),
+          sliderInput('a', HTML("&alpha;: shape"), 0.001, 10, step = 0.001, value = 0.01, width = '90%'),
+          sliderInput('b', HTML("&beta;: scale"), 0.001, 10, step = 0.001, value = 0.01, width = '90%'),
+          height = "100px"
+        )
+      } else if (input$distribution == "Chi-squared") {
+        shinyjs::disable("parameterization")
+        fillRow(
+          sliderInput('df', 'k: degrees of freedom', 0.001, 10, step = 0.001, value = 0.01, width = '90%'),
+          sliderInput('ncp', HTML("&lambda;: non-centrality parameter"), 0.001, 10, step = 0.001, value = 0.01, width = '90%'),
           height = "100px"
         )
       }
@@ -78,7 +85,7 @@ univariate_continuous_addin <- function() {
         curve(dnorm(x, mu, sigma),
               from = -20, to = 20, n = 201,
               ylab = expression(f(x ~ "|" ~ mu, sigma)), lwd = 2,
-              main = sprintf("Normal(%0.2f,%0.2f)", mu, sigma))
+              main = sprintf("x ~ Normal(%0.2f,%0.2f)", mu, sigma))
       } else if (input$distribution == "Beta") {
         if (input$parameterization == "Classic") {
           a <- input$a; b <- input$b
@@ -89,13 +96,21 @@ univariate_continuous_addin <- function() {
         curve(dbeta(x, shape1 = a, shape2 = b),
               from = 0, to = 1, n = 201,
               ylab = expression(f(x ~ "|" ~ alpha, beta)), lwd = 2,
-              main = sprintf("Beta(%0.2f,%0.2f)", a, b))
+              main = sprintf("x ~ Beta(%0.2f,%0.2f)", a, b))
       } else if (input$distribution == "Inverse-gamma") {
         a <- input$a; b <- input$b
         curve(extraDistr::dinvgamma(x, alpha = a, beta = b),
               from = 0, to = 10, n = 201,
               ylab = expression(f(x ~ "|" ~ alpha, beta)), lwd = 2,
-              main = sprintf("Inv-Gamma(%0.2f,%0.2f)", a, b))
+              main = sprintf("x ~ Inv-Gamma(%0.2f,%0.2f)", a, b))
+      } else if (input$distribution == "Chi-squared") {
+        df <- input$df; ncp <- input$ncp
+        curve(dchisq(x, df, ncp),
+              from = 0, to = 50, n = 201,
+              ylab = expression(f(x ~ "|" ~ k, lambda)), lwd = 2,
+              main = substitute(x ~ "~" ~ chi^{2} ~ group("(",list(df, ncp),")"), list(df = df, ncp = ncp)))
+        abline(v = ncp, lty = "dashed")
+        legend("topright", lty = "dashed", legend = expression(lambda), bty = "n")
       }
     })
     observeEvent(input$done, {
@@ -110,6 +125,8 @@ univariate_continuous_addin <- function() {
         }
       } else if (input$distribution == "Inverse-gamma") {
         output <- c("alpha" = input$a, "beta" = input$b)
+      } else if (input$distribution == "Chi-squared") {
+        output <- c("df" = input$df, "ncp" = input$ncp)
       }
       stopApp(output)
     })
