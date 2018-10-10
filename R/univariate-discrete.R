@@ -18,7 +18,7 @@ univariate_discrete_addin <- function() {
       fillRow(
         selectInput(
           "distribution", "Distribution",
-          c("Binomial", "Hypergeometric", "Poisson"),
+          c("Binomial", "Poisson"),
           selected = "Binomial", multiple = FALSE
         ),
         height = "100px"
@@ -37,24 +37,39 @@ univariate_discrete_addin <- function() {
           sliderInput('p', 'p: probability of success', 0, 1, step = 0.001, value = 0.5, width = '90%'),
           height = "100px"
         )
+      } else if (input$distribution == "Poisson") {
+        fillRow(
+          sliderInput('lambda', HTML("&lambda;: expected number of occurrences"), 0.01, 10, step = 0.01, value = 1, width = '90%'),
+          height = "100px"
+        )
       }
     })
     
     output$distribution <- renderPlot({
       if (input$distribution == "Binomial") {
         n <- input$n; p <- input$p
+        req(n, p)
         x <- 0:n
         y <- dbinom(x, n, p)
         title <- sprintf("Number of successes ~ Binomial(%0.2f,%0.2f)", n, p)
         y_lab <- expression(f(x ~ "|" ~ n, p))
+      } else if (input$distribution == "Poisson") {
+        lambda <- input$lambda
+        req(lambda)
+        x <- 0:10
+        y <- dpois(x, lambda)
+        title <- sprintf("Number of occurrences ~ Poisson(%0.2f)", lambda)
+        y_lab <- expression(f(x ~ "|" ~ lambda))
       }
       plot(x, y, type = "h", lwd = 2, xaxt = "n", xlab = expression(x), ylab = y_lab, main = title)
-      points(0:n, dbinom(0:n, n, p), pch = 16)
+      points(x, y, pch = 16)
       axis(1, x)
     })
     observeEvent(input$done, {
       if (input$distribution == "Binomial") {
         output <- c("n" = input$n, "p" = input$p)
+      } else if (input$distribution == "Poisson") {
+        output <- c("lambda" = input$lambda)
       }
       stopApp(output)
     })
