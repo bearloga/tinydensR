@@ -19,11 +19,14 @@ devtools::install_github("bearloga/tinydensR")
     - [x] Poisson
   - Continuous
     - [x] Beta
+    - [x] Cauchy
     - [x] Chi-squared
-    - [ ] Exponential
-    - [ ] Gamma
+    - [x] Exponential
+    - [x] Gamma
     - [x] Inverse-gamma
     - [x] Normal
+    - [x] Log-Normal
+    - [x] Student-t
     - [x] Weibull
     - [x] [Exponentiated Weibull](https://en.wikipedia.org/wiki/Exponentiated_Weibull_distribution)
 - Multivariate

@@ -24,9 +24,19 @@ univariate_continuous_addin <- function() {
       fillRow(
         selectInput(
           "distribution", "Distribution",
-          c("Normal", "Beta", "Inverse-gamma", "Chi-squared",
-            "Weibull (incl. exponentiated)"),
-          selected = "Beta", multiple = FALSE
+          c(
+            "Beta",
+            "Cauchy",
+            "Chi-squared",
+            "Exponential",
+            "Gamma",
+            "Inverse-gamma",
+            "Log-Normal",
+            "Normal",
+            "Student-t",
+            "Weibull (incl. exponentiated)"
+          ),
+          multiple = FALSE
         ),
         radioButtons("parameterization", "Parameterization",
                      choices = c("Classic", "Intuitive"),
@@ -41,16 +51,10 @@ univariate_continuous_addin <- function() {
   
   server <- function(input, output, session) {
     observe({
-      shinyjs::toggleState("parameterization", condition = input$distribution == "Beta")
+      shinyjs::toggleState("parameterization", condition = input$distribution %in% c("Beta", "Gamma"))
     })
     output$parameters <- renderUI({
-      if (input$distribution == "Normal") {
-        fillRow(
-          sliderInput('mean', HTML("&mu;"), -10, 10, step = 0.1, value = 0, width = '90%'),
-          sliderInput('sd', HTML("&sigma;"), 0.1, 100, step = 0.1, value = 1, width = '90%'),
-          height = "100px"
-        )
-      } else if (input$distribution == "Beta") {
+      if (input$distribution == "Beta") {
         if (input$parameterization == "Classic") {
           fillRow(
             sliderInput('a', HTML("&alpha;"), 0.1, 100, step = 0.01, value = 1.5, width = '90%'),
@@ -64,16 +68,58 @@ univariate_continuous_addin <- function() {
             height = "100px"
           )
         }
-      } else if (input$distribution == "Inverse-gamma") {
+      } else if (input$distribution == "Cauchy") {
         fillRow(
-          sliderInput('a', HTML("&alpha;: shape"), 0.001, 10, step = 0.001, value = 0.01, width = '90%'),
-          sliderInput('b', HTML("&beta;: scale"), 0.001, 10, step = 0.001, value = 0.01, width = '90%'),
+          sliderInput('location', HTML("x<sub>0</sub>: location"), -10, 10, step = 1, value = 0, width = '90%'),
+          sliderInput('scale', HTML("&gamma;: scale"), 0.001, 10, step = 0.001, value = 5, width = '90%'),
           height = "100px"
         )
       } else if (input$distribution == "Chi-squared") {
         fillRow(
           sliderInput('df', 'k: degrees of freedom', 0.001, 10, step = 0.001, value = 0.01, width = '90%'),
           sliderInput('ncp', HTML("&lambda;: non-centrality parameter"), 0.001, 10, step = 0.001, value = 0.01, width = '90%'),
+          height = "100px"
+        )
+      } else if (input$distribution == "Exponential") {
+        fillRow(
+          sliderInput('rate', HTML("&lambda;: rate"), 0.001, 2, step = 0.001, value = 0.01, width = '90%'),
+          height = "100px"
+        )
+      } else if (input$distribution == "Gamma") {
+        if (input$parameterization == "Classic") {
+          fillRow(
+            sliderInput('shape', 'k: shape', 0.01, 10, step = 0.01, value = 2, width = '90%'),
+            sliderInput('scale', HTML("&theta;: scale"), 0.1, 2, step = 0.1, value = 1.5, width = '90%'),
+            height = "100px"
+          )
+        } else {
+          fillRow(
+            sliderInput('shape', HTML("&alpha;: shape"), 0.01, 10, step = 0.01, value = 2, width = '90%'),
+            sliderInput('rate', HTML("&beta;: rate"), 0.5, 10, step = 0.1, value = 0.667, width = '90%'),
+            height = "100px"
+          )
+        }
+      } else if (input$distribution == "Inverse-gamma") {
+        fillRow(
+          sliderInput('a', HTML("&alpha;: shape"), 0.001, 10, step = 0.001, value = 0.01, width = '90%'),
+          sliderInput('b', HTML("&beta;: scale"), 0.001, 10, step = 0.001, value = 0.01, width = '90%'),
+          height = "100px"
+        )
+      } else if (input$distribution == "Log-Normal") {
+        fillRow(
+          sliderInput('mean', HTML("&mu;"), -2, 10, step = 0.1, value = 0, width = '90%'),
+          sliderInput('sd', HTML("&sigma;"), 0.1, 4, step = 0.1, value = 1, width = '90%'),
+          height = "100px"
+        )
+      } else if (input$distribution == "Normal") {
+        fillRow(
+          sliderInput('mean', HTML("&mu;"), -10, 10, step = 0.1, value = 0, width = '90%'),
+          sliderInput('sd', HTML("&sigma;"), 0.1, 100, step = 0.1, value = 1, width = '90%'),
+          height = "100px"
+        )
+      } else if (input$distribution == "Student-t") {
+        fillRow(
+          sliderInput('df', HTML("&nu;: degrees of freedom"), 0.001, 10, step = 0.001, value = 0.5, width = '90%'),
           height = "100px"
         )
       } else if (input$distribution == "Weibull (incl. exponentiated)") {
@@ -90,14 +136,7 @@ univariate_continuous_addin <- function() {
     })
     
     output$distribution <- renderPlot({
-      if (input$distribution == "Normal") {
-        mu <- input$mean; sigma <- input$sd
-        req(mu, sigma)
-        curve(dnorm(x, mu, sigma),
-              from = -20, to = 20, n = 201,
-              ylab = expression(f(x ~ "|" ~ mu, sigma)), lwd = 2,
-              main = sprintf("x ~ Normal(%0.2f,%0.2f)", mu, sigma))
-      } else if (input$distribution == "Beta") {
+      if (input$distribution == "Beta") {
         if (input$parameterization == "Classic") {
           a <- input$a; b <- input$b
         } else {
@@ -109,13 +148,13 @@ univariate_continuous_addin <- function() {
               from = 0, to = 1, n = 201,
               ylab = expression(f(x ~ "|" ~ alpha, beta)), lwd = 2,
               main = sprintf("x ~ Beta(%0.2f,%0.2f)", a, b))
-      } else if (input$distribution == "Inverse-gamma") {
-        a <- input$a; b <- input$b
-        req(a, b)
-        curve(extraDistr::dinvgamma(x, alpha = a, beta = b),
-              from = 0, to = 10, n = 201,
-              ylab = expression(f(x ~ "|" ~ alpha, beta)), lwd = 2,
-              main = sprintf("x ~ Inv-Gamma(%0.2f,%0.2f)", a, b))
+      } else if (input$distribution == "Cauchy") {
+        location <- input$location; scale <- input$scale
+        req(location, scale)
+        curve(dcauchy(x, location = location, scale = scale),
+              from = -20, to = 20, n = 401,
+              ylab = expression(f(x ~ "|" ~ x[0], gamma)), lwd = 2,
+              main = sprintf("x ~ Cauchy(%0.2f,%0.2f)", location, scale))
       } else if (input$distribution == "Chi-squared") {
         df <- input$df; ncp <- input$ncp
         req(df, ncp)
@@ -125,6 +164,53 @@ univariate_continuous_addin <- function() {
               main = substitute(x ~ "~" ~ chi^{2} ~ group("(",list(df, ncp),")"), list(df = df, ncp = ncp)))
         abline(v = ncp, lty = "dashed")
         legend("topright", lty = "dashed", legend = expression(lambda), bty = "n")
+      } else if (input$distribution == "Exponential") {
+        rate <- input$rate
+        req(rate)
+        curve(dexp(x, rate = rate),
+              from = 0, to = 20, n = 401,
+              ylab = expression(f(x ~ "|" ~ lambda)), lwd = 2,
+              main = sprintf("x ~ Exp(%0.2f)", rate))
+      } else if (input$distribution == "Gamma") {
+        shape <- input$shape
+        if (input$parameterization == "Classic") {
+          scale <- input$scale
+        } else {
+          scale <- 1 / input$rate
+        }
+        req(shape, scale)
+        curve(dgamma(x, shape = shape, scale = scale),
+              from = 0, to = 20, n = 201,
+              ylab = expression(f(x ~ "|" ~ alpha, beta)), lwd = 2,
+              main = sprintf("x ~ Gamma(%0.2f,%0.2f)", shape, scale))
+      } else if (input$distribution == "Inverse-gamma") {
+        a <- input$a; b <- input$b
+        req(a, b)
+        curve(extraDistr::dinvgamma(x, alpha = a, beta = b),
+              from = 0, to = 10, n = 201,
+              ylab = expression(f(x ~ "|" ~ alpha, beta)), lwd = 2,
+              main = sprintf("x ~ Inv-Gamma(%0.2f,%0.2f)", a, b))
+      } else if (input$distribution == "Log-Normal") {
+        mulog <- input$mean; sigmalog <- input$sd
+        req(mulog, sigmalog)
+        curve(dlnorm(x, meanlog = mulog, sdlog = sigmalog),
+              from = 0, to = 10, n = 201,
+              ylab = expression(f(x ~ "|" ~ mu, sigma)), lwd = 2,
+              main = sprintf("x ~ Log-Normal(%0.2f,%0.2f)", mulog, sigmalog))
+      } else if (input$distribution == "Normal") {
+        mu <- input$mean; sigma <- input$sd
+        req(mu, sigma)
+        curve(dnorm(x, mu, sigma),
+              from = -20, to = 20, n = 201,
+              ylab = expression(f(x ~ "|" ~ mu, sigma)), lwd = 2,
+              main = sprintf("x ~ Normal(%0.2f,%0.2f)", mu, sigma))
+      } else if (input$distribution == "Student-t") {
+        df <- input$df
+        req(df)
+        curve(dt(x, df),
+              from = -20, to = 20, n = 201,
+              ylab = expression(f(x ~ "|" ~ nu)), lwd = 2,
+              main = sprintf("x ~ t(%0.3f)", df))
       } else if (input$distribution == "Weibull (incl. exponentiated)") {
         dweibull <- function(x, k, alpha, lambda) {
           return(alpha * (k / lambda) * (x / lambda)^(k - 1) * (1 - exp(-(x / lambda)^k))^(alpha - 1) * exp(-(x / lambda)^k))
@@ -141,19 +227,33 @@ univariate_continuous_addin <- function() {
       }
     })
     observeEvent(input$done, {
-      if (input$distribution == "Normal") {
-        output <- c("mean" = input$mean, "std.dev" = input$sd)
-      } else if (input$distribution == "Beta") {
+      if (input$distribution == "Beta") {
         if (input$parameterization == "Classic") {
           output <- c("shape1" = input$a, "shape2" = input$b)
         } else {
           output <- c("shape1" = input$expectation * input$precision,
                       "shape2" = (1 - input$expectation) * input$precision)
         }
-      } else if (input$distribution == "Inverse-gamma") {
-        output <- c("alpha" = input$a, "beta" = input$b)
+      } else if (input$distribution == "Cauchy") {
+        output <- c("location" = input$location, "scale" = input$scale)
       } else if (input$distribution == "Chi-squared") {
         output <- c("df" = input$df, "ncp" = input$ncp)
+      } else if (input$distribution == "Exponential") {
+        output <- c("rate" = input$rate)
+      } else if (input$distribution == "Gamma") {
+        if (input$parameterization == "Classic") {
+          output <- c("shape" = input$shape, "scale" = input$scale)
+        } else {
+          output <- c("shape" = input$shape, "rate" = input$rate)
+        }
+      } else if (input$distribution == "Inverse-gamma") {
+        output <- c("alpha" = input$a, "beta" = input$b)
+      } else if (input$distribution == "Log-Normal") {
+        output <- c("meanlog" = input$mean, "sdlog" = input$sd)
+      } else if (input$distribution == "Normal") {
+        output <- c("mean" = input$mean, "std.dev" = input$sd)
+      } else if (input$distribution == "Student-t") {
+        output <- c("df" = input$df)
       } else if (input$distribution == "Weibull (incl. exponentiated)") {
         output <- c("k (shape 1)" = input$shape1,
                     "alpha (shape 2)" = input$shape2,

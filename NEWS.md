@@ -1,4 +1,9 @@
-tidydensR 0.1.1
+tinydensR 0.1.1
+---------------
+
+* Added: Log-Normal, Cauchy, Exponential, Gamma, Student-t
+
+tinydensR 0.1.1
 ---------------
 
 * Added Weibull and Exponentiated Weibull

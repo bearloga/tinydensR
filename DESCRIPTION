@@ -1,8 +1,8 @@
 Package: tinydensR
 Type: Package
 Title: Interactive Visualization of Probability Distributions
-Version: 0.1.1
-Date: 2018-10-09
+Version: 0.1.2
+Date: 2018-10-10
 Authors@R: c(
     person("Mikhail", "Popov", email = "mikhail@mpopov.com",
            role = c("aut", "cre"), comment = "@bearloga on Twitter")
