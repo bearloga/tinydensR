@@ -11,5 +11,5 @@ A named vector containing the chosen parameter value(s).
 }
 \description{
 This gadget lets you choose the parameters of a univariate,
-  discrete distribution easily.
+discrete distribution easily.
 }

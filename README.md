@@ -24,12 +24,14 @@ devtools::install_github("bearloga/tinydensR")
     - [ ] Gamma
     - [x] Inverse-gamma
     - [x] Normal
+    - [x] Weibull
+    - [x] [Exponentiated Weibull](https://en.wikipedia.org/wiki/Exponentiated_Weibull_distribution)
 - Multivariate
   - Discrete
     - [ ] Multinomial
   - Continuous
     - [ ] Bivariate Normal
-    - [ ] Dirichlet
+    - [ ] Dirichlet (maybe???)
 
 ## Code of Conduct
 

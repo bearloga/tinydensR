@@ -1,9 +1,9 @@
-MLPUGS 0.2.0
-------------
+tidydensR 0.1.1
+---------------
 
-* Massive refactoring to make code and documentation reader-friendlier for CRAN debut
-* Uses and includes FiveThirtyEight's movie ratings dataset for tutorial vignette
-* Added progress bar support but falls back on messaging if 'progress' is not installed
-* Removed references to in-development package 'greenr'
-* Updated Code of Conduct
-* Correct licensing
+* Added Weibull and Exponentiated Weibull
+
+tinydensR 0.1.0
+---------------
+
+* Some starting distributions
