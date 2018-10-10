@@ -16,7 +16,7 @@ devtools::install_github("bearloga/tinydensR")
   - Discrete
     - [x] Binomial
     - [ ] Hypergeometric
-    - [ ] Poisson
+    - [x] Poisson
   - Continuous
     - [x] Beta
     - [x] Chi-squared
@@ -31,7 +31,6 @@ devtools::install_github("bearloga/tinydensR")
     - [ ] Multinomial
   - Continuous
     - [ ] Bivariate Normal
-    - [ ] Dirichlet (maybe???)
 
 ## Code of Conduct
 
