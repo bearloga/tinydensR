@@ -182,7 +182,7 @@ univariate_continuous_addin <- function() {
         curve(dgamma(x, shape = shape, scale = scale),
               from = 0, to = 20, n = 201,
               ylab = expression(f(x ~ "|" ~ alpha, beta)), lwd = 2,
-              main = sprintf("x ~ Gamma(%0.2f,%0.2f)", shape, scale))
+              main = sprintf("x ~ Gamma(%0.2f,%0.2f)", shape, 1 / scale))
       } else if (input$distribution == "Inverse-gamma") {
         a <- input$a; b <- input$b
         req(a, b)
