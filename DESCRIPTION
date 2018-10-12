@@ -1,7 +1,7 @@
 Package: tinydensR
 Type: Package
 Title: Interactive Visualization of Probability Distributions
-Version: 0.1.2
+Version: 0.1.3
 Date: 2018-10-10
 Authors@R: c(
     person("Mikhail", "Popov", email = "mikhail@mpopov.com",
@@ -19,7 +19,8 @@ Imports:
     miniUI (>= 0.1),
     shinythemes (>= 1.1.1),
     shinyjs (>= 0.9),
-    extraDistr (>= 1.8.4)
+    extraDistr (>= 1.8.4),
+    zeallot
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 6.1.0

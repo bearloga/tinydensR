@@ -1,3 +1,8 @@
+tinydensR 0.1.3
+
+* Added X and Y axis customization options
+* Increased number of possible values of k for Weibull
+
 tinydensR 0.1.1
 ---------------
 
