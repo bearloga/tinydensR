@@ -72,6 +72,7 @@ univariate_discrete_addin <- function() {
         y <- dbinom(x, n, p)
         title <- sprintf("Number of successes ~ Binomial(%0.2f,%0.2f)", n, p)
         y_lab <- expression(f(x ~ "|" ~ n, p))
+        x_lab <- expression(x)
       } else if (input$distribution == "Hypergeometric") {
         req(input$N, input$K, input$n)
         N <- input$N # total number of balls (black and white) in urn
@@ -80,8 +81,9 @@ univariate_discrete_addin <- function() {
         req(K <= N, n <= N)
         x <- 0:min(n, K)
         y <- dhyper(x, m = K, n = N - K, k = n)
-        title <- sprintf("Number of successes ~ Hypergeometric(%i, %i, %i)", N, K, n)
-        y_lab <- expression(f(x ~ "|" ~ N, K, n))
+        title <- sprintf("Selected instances with feature ~ Hypergeometric(%i, %i, %i)", N, K, n)
+        y_lab <- expression(f(k ~ "|" ~ N, K, n))
+        x_lab <- expression(k)
       } else if (input$distribution == "Poisson") {
         lambda <- input$lambda
         req(lambda)
@@ -89,8 +91,9 @@ univariate_discrete_addin <- function() {
         y <- dpois(x, lambda)
         title <- sprintf("Number of occurrences ~ Poisson(%0.2f)", lambda)
         y_lab <- expression(f(x ~ "|" ~ lambda))
+        x_lab <- expression(x)
       }
-      plot(x, y, type = "h", lwd = 2, xaxt = "n", xlab = expression(x), ylab = y_lab, main = title)
+      plot(x, y, type = "h", lwd = 2, xaxt = "n", xlab = x_lab, ylab = y_lab, main = title)
       points(x, y, pch = 16)
       axis(1, x)
     })
