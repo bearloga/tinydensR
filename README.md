@@ -5,9 +5,8 @@ An [RStudio add-in](https://shiny.rstudio.com/articles/gadgets.html) for playing
 ## Installation
 
 ```R
-if ( !('devtools' %in% installed.packages()) ) install.packages("devtools")
-
-devtools::install_github("bearloga/tinydensR")
+# install.packages("remotes")
+remotes::install_github("bearloga/tinydensR")
 ```
 
 ## Distributions
